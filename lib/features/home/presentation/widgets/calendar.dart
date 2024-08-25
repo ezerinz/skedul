@@ -32,6 +32,7 @@ class _CalendarContainerState extends ConsumerState<CalendarContainer> {
         ref.read(calendarProvider.notifier).updateSelected(
               selectedDate.copyWith(
                   month: date.month,
+                  year: date.year,
                   day: calendarFormat == CalendarFormat.week ? date.day : null),
             );
         ref.read(calendarPageProvider.notifier).update(date);
@@ -160,11 +161,11 @@ class _CalendarContainerState extends ConsumerState<CalendarContainer> {
       startingDayOfWeek: StartingDayOfWeek.monday,
       locale: "id_ID",
       rowHeight: widget.rowHeight,
-      firstDay: todayDate.subtract(
+      firstDay: selectedDate.subtract(
         const Duration(days: 365 * 2),
       ),
       lastDay: todayDate.add(
-        const Duration(days: 365 * 10),
+        const Duration(days: 365 * 5),
       ),
       focusedDay: selectedDate,
     );
