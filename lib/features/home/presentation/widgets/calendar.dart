@@ -9,19 +9,30 @@ import 'package:skedul/shared/provider/date/datenow.dart';
 import 'package:skedul/shared/theme/theme.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class CalendarContainer extends ConsumerWidget {
+class CalendarContainer extends ConsumerStatefulWidget {
   const CalendarContainer(this.events, {super.key, required this.rowHeight});
   final double rowHeight;
   final LinkedHashMap<DateTime, List<TugasModel>> events;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CalendarContainer> createState() => _CalendarContainerState();
+}
+
+class _CalendarContainerState extends ConsumerState<CalendarContainer> {
+  CalendarFormat calendarFormat = CalendarFormat.month;
+
+  @override
+  Widget build(BuildContext context) {
     final selectedDate = ref.watch(calendarProvider);
     final todayDate = ref.watch(todayDateProvider).toLocal();
+
     return TableCalendar(
+      calendarFormat: calendarFormat,
       onPageChanged: (date) {
         ref.read(calendarProvider.notifier).updateSelected(
-              selectedDate.copyWith(month: date.month),
+              selectedDate.copyWith(
+                  month: date.month,
+                  day: calendarFormat == CalendarFormat.week ? date.day : null),
             );
         ref.read(calendarPageProvider.notifier).update(date);
       },
@@ -35,9 +46,35 @@ class CalendarContainer extends ConsumerWidget {
       },
       currentDay: ref.watch(todayDateProvider).toLocal(),
       eventLoader: (dates) {
-        return events[dates] ?? [];
+        return widget.events[dates] ?? [];
       },
       calendarBuilders: CalendarBuilders(
+        headerTitleBuilder: (context, day) {
+          return Row(
+            children: [
+              Expanded(
+                child: Text(
+                  DateFormat("MMMM yyyy", "ID_id").format(day),
+                  style: AppTheme.kTextSemiBold18,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    if (CalendarFormat.month == calendarFormat) {
+                      calendarFormat = CalendarFormat.week;
+                    } else {
+                      calendarFormat = CalendarFormat.month;
+                    }
+                  });
+                },
+                icon: Icon(calendarFormat == CalendarFormat.month
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down),
+              ),
+            ],
+          );
+        },
         todayBuilder: (context, day, focusedDay) {
           return Center(
             child: Text(
@@ -93,7 +130,7 @@ class CalendarContainer extends ConsumerWidget {
       ),
       headerStyle: const HeaderStyle(
         headerPadding: EdgeInsets.only(bottom: 8.0),
-        titleCentered: true,
+        formatButtonVisible: false,
         titleTextStyle: TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 20,
@@ -111,10 +148,18 @@ class CalendarContainer extends ConsumerWidget {
           color: Colors.white,
         ),
       ),
-      availableCalendarFormats: const {CalendarFormat.month: "month"},
+      // onFormatChanged: (format) {
+      //   setState(() {
+      //     calendarFormat = format;
+      //   });
+      // },
+      availableCalendarFormats: const {
+        CalendarFormat.month: "",
+        CalendarFormat.week: ""
+      },
       startingDayOfWeek: StartingDayOfWeek.monday,
       locale: "id_ID",
-      rowHeight: 45.0,
+      rowHeight: widget.rowHeight,
       firstDay: todayDate.subtract(
         const Duration(days: 365 * 2),
       ),

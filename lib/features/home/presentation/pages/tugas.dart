@@ -32,7 +32,7 @@ class TugasPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 92.0),
+        // physics: NeverScrollableScrollPhysics(),
         child: Column(
           children: [
             switch (dataTugas) {
@@ -45,28 +45,32 @@ class TugasPage extends ConsumerWidget {
               thickness: 1.0,
             ),
             switch (dataTugas) {
-              AsyncData(:final value) => Column(
-                  children: [
-                    ListTugas(
-                      value[selectedDay.toLocal()] ?? [],
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        context.goNamed(
-                          "tambahtugas",
-                          extra: {"date": ref.watch(calendarProvider)},
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: DottedCard(
-                          icon: Icons.add,
-                          text:
-                              "Tambahkan tugas\nuntuk ${DateFormat("dd MMMM", "ID_id").format(ref.watch(calendarProvider))}"),
-                    )
-                  ],
+              AsyncData(:final value) => Padding(
+                  padding:
+                      EdgeInsets.only(left: 15.0, right: 15.0, bottom: 92.0),
+                  child: Column(
+                    children: [
+                      ListTugas(
+                        value[selectedDay.toLocal()] ?? [],
+                      ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          context.goNamed(
+                            "tambahtugas",
+                            extra: {"date": ref.watch(calendarProvider)},
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: DottedCard(
+                            icon: Icons.add,
+                            text:
+                                "Tambahkan tugas\nuntuk ${DateFormat("dd MMMM", "ID_id").format(ref.watch(calendarProvider))}"),
+                      )
+                    ],
+                  ),
                 ),
               AsyncError(:final error) => Text("$error"),
               _ => const DottedCardLoading(),
