@@ -1,16 +1,26 @@
 # Skedul
 
-A new Flutter project.
+<img width=250 src="assets/Icon.png"><img>
 
-## Getting Started
+Aplikasi *schedule planner* untuk mencatat tugas dan kuliah.
 
-This project is a starting point for a Flutter application.
+## Preview
+<img width=300 src="https://github.com/user-attachments/assets/cf6c8705-aab0-423c-a973-c26941122451">
+&nbsp;
+<img width=300 src="https://github.com/user-attachments/assets/4e621f4b-6fbf-4f98-b91a-af21627a732a">
+<br>
+<img width=300 src="https://github.com/user-attachments/assets/58b475db-5dda-4223-baf5-5487201f538c">
+&nbsp;
+<img width=300 src="https://github.com/user-attachments/assets/c5fb45aa-23c5-4f7c-816d-4c9f4e841358">
+<br>
+<img width=300 src="https://github.com/user-attachments/assets/84079f47-ecff-4986-aaa8-3da36785aa6b">
+&nbsp;
+<img width=300 src="https://github.com/user-attachments/assets/abe56e51-390c-431d-b906-3c57cc6e5b42">
 
-A few resources to get you started if this is your first Flutter project:
+## Download
+Aplikasi dapat didownload di halaman **[releases](https://github.com/ezerinz/skedul/releases/latest)**
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Informasi
+- Versi Flutter: **3.24.0**
+- State Management: **Riverpod**
+- Database: **Realm**
