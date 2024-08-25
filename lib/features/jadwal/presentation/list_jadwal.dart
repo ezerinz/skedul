@@ -1,207 +1,112 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skedul/features/jadwal/data/jadwal_repository_provider.dart';
+import 'package:skedul/features/jadwal/data/jadwal_repository.dart';
 import 'package:skedul/features/jadwal/presentation/controller/jadwal_provider.dart';
-import 'package:skedul/shared/theme/colors.dart';
+import 'package:skedul/shared/theme/theme.dart';
+import 'package:skedul/shared/utils/extensions.dart';
 import 'package:skedul/shared/utils/utils.dart';
-import 'package:skedul/shared/widgets/card.dart';
 import 'package:skedul/shared/widgets/dotted_card.dart';
 import 'package:skedul/shared/widgets/dotted_card_loading.dart';
-import 'package:skedul/shared/widgets/slidable_quick_actions.dart';
+import 'package:skedul/shared/widgets/slidable_card.dart';
 
 class ListJadwal extends ConsumerStatefulWidget {
-  const ListJadwal(
-      {super.key,
-      required this.day,
-      this.forHomescreen = true,
-      this.isTomorrow = false});
+  const ListJadwal(this.day, {super.key, this.slidable = true});
 
   final int day;
-  final bool forHomescreen;
-  final bool isTomorrow;
+  final bool slidable;
 
   @override
   ConsumerState<ListJadwal> createState() => _ListJadwalState();
 }
 
-class _ListJadwalState extends ConsumerState<ListJadwal>
-    with TickerProviderStateMixin {
+class _ListJadwalState extends ConsumerState<ListJadwal> {
   @override
   Widget build(BuildContext context) {
-    final data = ref.watch(jadwalProvider(widget.day));
+    final data = ref.watch(
+      jadwalProvider(
+        widget.day,
+      ),
+    );
+
     return switch (data) {
       AsyncData(:final value) => value.isEmpty
-          ? Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 10.0,
-              ),
-              child: Column(
-                children: [
-                  DottedCard(
-                    icon: Icons.not_interested,
-                    text: widget.day == 0
-                        ? "Jadwal Kosong"
-                        : "Jadwal${!widget.isTomorrow ? " hari" : ""} ${widget.forHomescreen ? widget.isTomorrow ? "besok" : "ini" : intToDay(widget.day).toLowerCase()} kosong.\n Selamat berlibur",
-                  ),
-                  if (!widget.forHomescreen)
-                    const SizedBox(
-                      height: 15.0,
-                    ),
-                  if (!widget.forHomescreen)
-                    InkWell(
-                      borderRadius: BorderRadius.circular(10.0),
-                      onTap: () {
-                        final extra = {"day": intToDay(widget.day)};
-                        context.go("/home/add-jadwal",
-                            extra: widget.day == 0 ? null : extra);
-                      },
-                      child: DottedCard(
-                        icon: Icons.add,
-                        text: widget.day == 0
-                            ? "Tambah jadwal"
-                            : "Tambah jadwal untuk\nhari ${intToDay(widget.day).toLowerCase()}",
-                      ),
-                    ),
-                ],
-              ),
+          ? const DottedCard(
+              icon: Icons.not_interested,
+              text: "Tidak ada kuliah,\nselamat berlibur",
             )
-          : SlidableAutoCloseBehavior(
-              child: Column(
-                children: [
-                  ...List.generate(
-                    value.length * 2,
-                    (index) {
-                      final slidableController = SlidableController(this);
-                      if (index % 2 == 0) {
-                        return const SizedBox(
-                          height: 10.0,
-                        );
-                      } else {
-                        var i = index ~/ 2;
-                        var kuliah = value[i];
-                        return widget.forHomescreen
-                            ? CustomCard(
-                                title: kuliah.nama,
-                                percentColor: kColorPrimary,
-                                titleWidget: Row(children: [
-                                  Flexible(
-                                    child: Text(
-                                      kuliah.nama,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 4.0,
-                                  ),
-                                  Text(
-                                    "- ${kuliah.kelas}",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ]),
-                                subtitle1: kuliah.ruangan,
-                                subtitle2:
-                                    "${kuliah.jam} - ${calculateEndTime(kuliah.jam, kuliah.sks)}",
-                                backgroundColor: kColorPrimarySilver,
-                                foregroundColor: kColorPrimaryDeep,
-                              )
-                            : SlidableQuickActions(
-                                controller: slidableController,
-                                delete: () {
-                                  ref
-                                      .watch(jadwalRepositoryProvider)
-                                      .deleteMakul(kuliah.id)
-                                      .then((value) {
-                                    if (context.canPop()) context.pop();
-                                  });
-                                },
-                                edit: (context) {
-                                  context.go("/home/add-jadwal",
-                                      extra: {"edit": true, "data": kuliah});
-                                },
-                                child: ValueListenableBuilder<int>(
-                                  valueListenable: slidableController.direction,
-                                  builder: (context, value, child) =>
-                                      CustomCard(
-                                    title: kuliah.nama,
-                                    titleWidget: Row(children: [
-                                      Flexible(
-                                        child: Text(
-                                          kuliah.nama,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 4.0,
-                                      ),
-                                      Text(
-                                        "- ${kuliah.kelas}",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16,
-                                        ),
-                                      )
-                                    ]),
-                                    subtitle1: kuliah.ruangan,
-                                    subtitle2:
-                                        "${widget.day == 0 ? "${intToDay(kuliah.hari)}, " : ""}${kuliah.jam} - ${calculateEndTime(kuliah.jam, kuliah.sks)}",
-                                    backgroundColor: kColorPrimarySilver,
-                                    foregroundColor: kColorPrimaryDeep,
-                                    percentColor: kColorPrimary,
-                                    actionIcon: value == 0
-                                        ? Icons.arrow_back_ios_new
-                                        : Icons.close,
-                                    actionPressed: () {
-                                      if (value == 0) {
-                                        slidableController.openEndActionPane();
-                                      } else {
-                                        slidableController.close();
-                                      }
-                                    },
-                                  ),
-                                ),
-                              );
-                      }
-                    },
-                  ),
-                  if (!widget.forHomescreen)
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                  if (!widget.forHomescreen)
-                    InkWell(
-                      borderRadius: BorderRadius.circular(10.0),
-                      onTap: () {
-                        final extra = {"day": intToDay(widget.day)};
-                        context.go("/home/add-jadwal", extra: extra);
-                      },
-                      child: const DottedCard(
-                        icon: Icons.add,
-                        text: "Tambah jadwal",
+          : Column(
+              children: List.generate(value.length, (index) {
+                final data = value[index];
+                return SlidableCard(
+                  title: "${data.nama} - ${data.kelas}",
+                  subtitle1: data.ruangan,
+                  subtitle2:
+                      "${widget.day == 0 ? "${intToDay(data.hari)}, " : ""}${data.jam!.hour.toString().padLeft(2, "0")}:${data.jam!.minute.toString().padLeft(2, "0")} - ${calculateEndTime("${data.jam!.hour}:${data.jam!.minute}", data.sks)}",
+                  backgroundColor: AppTheme.kColorPrimarySilver,
+                  foregroundColor: AppTheme.kColorPrimary,
+                  slidable: widget.slidable,
+                  edit: () {
+                    context.goNamed("tambahjadwal", extra: {
+                      "edit": true,
+                      "data": data,
+                    });
+                  },
+                  delete: () {
+                    context.pushNamed("confirm-dialog", extra: [
+                      const Text(
+                        "Hapus",
+                        style: AppTheme.kTextSemiBold24,
                       ),
-                    ),
-                  if (!widget.forHomescreen)
-                    const SizedBox(
-                      height: 15.0,
-                    ),
-                ],
-              ),
+                      Text(
+                        "Apakah kamu yakin untuk menghapus? Semua tugas untuk mata kuliah ini akan terhapus",
+                        textAlign: TextAlign.center,
+                        style: AppTheme.kTextMedium16.copyWith(fontSize: 14),
+                      ),
+                      [
+                        ElevatedButton(
+                          onPressed: () {
+                            context.pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            surfaceTintColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            foregroundColor: AppTheme.kColorPrimary,
+                            backgroundColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: const Text("Batal"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .watch(jadwalRepositoryProvider)
+                                .deleteMakul(data.id);
+                            context.pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            surfaceTintColor: Colors.transparent,
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            foregroundColor: AppTheme.kColorSecondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: const Text("Hapus"),
+                        ),
+                      ]
+                    ]);
+                  },
+                );
+              }).withSpaceBetween(height: 10.0),
             ),
-      AsyncError(:final error) => Text(error.toString()),
+      AsyncError(
+        :final error,
+      ) =>
+        Text("$error"),
       _ => const DottedCardLoading()
     };
   }

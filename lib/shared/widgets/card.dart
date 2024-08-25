@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skedul/shared/provider/settings/system_theme_provider.dart';
-import 'package:skedul/shared/theme/text.dart';
+import 'package:skedul/shared/provider/settings/settings_provider.dart';
+import 'package:skedul/shared/theme/theme.dart';
 
 class CustomCard extends ConsumerWidget {
   const CustomCard(
@@ -32,8 +32,7 @@ class CustomCard extends ConsumerWidget {
     const double fillPercent = 2.5;
     const double fillStop = fillPercent / 100;
     final List<double> stops = [0.0, fillStop, fillStop, 1.0];
-    final isDark = ref.watch(themeChoosenProvider);
-    Color bgColor = percentColor ?? backgroundColor;
+    final isDark = ref.watch(isDarkModeProvider);
 
     return Container(
       width: double.infinity,
@@ -41,23 +40,28 @@ class CustomCard extends ConsumerWidget {
       padding: const EdgeInsets.only(left: 10.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
-        gradient: LinearGradient(
-          colors: [
-            // backgroundColor.withOpacity(isDark ? 0.5 : 0.70),
-            // backgroundColor.withOpacity(isDark ? 0.5 : 0.70),
-            bgColor.withOpacity(isDark ? 0.5 : 0.70),
-            bgColor.withOpacity(isDark ? 0.5 : 0.70),
-            backgroundColor.withOpacity(isDark ? 0.15 : 0.30),
-            backgroundColor.withOpacity(isDark ? 0.15 : 0.30)
-          ],
-          stops: stops,
-        ),
+        color: backgroundColor.withOpacity(isDark ? 0.15 : 0.30),
+        // gradient: LinearGradient(
+        //   colors: [
+        //     foregroundColor.withOpacity(isDark ? 0.50 : 0.8),
+        //     foregroundColor.withOpacity(isDark ? 0.50 : 0.8),
+        //     backgroundColor.withOpacity(isDark ? 0.15 : 0.30),
+        //     backgroundColor.withOpacity(isDark ? 0.15 : 0.30)
+        //   ],
+        //   stops: stops,
+        // ),
       ),
       child: Center(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Container(
+              width: 15,
+              color: foregroundColor.withOpacity(
+                isDark ? 0.50 : 0.8,
+              ),
+            ),
             Expanded(
               child: InkWell(
                 onTap: onCardTap,
@@ -89,7 +93,7 @@ class CustomCard extends ConsumerWidget {
                           Expanded(
                             child: Text(
                               subtitle1,
-                              style: kTextSemiBold24.copyWith(
+                              style: AppTheme.kTextSemiBold24.copyWith(
                                 fontSize: 14,
                                 // color: foregroundColor.withOpacity(0.75),
                               ),
@@ -112,7 +116,7 @@ class CustomCard extends ConsumerWidget {
                           Expanded(
                             child: Text(
                               subtitle2,
-                              style: kTextSemiBold24.copyWith(
+                              style: AppTheme.kTextSemiBold24.copyWith(
                                 fontSize: 14,
                                 // color: foregroundColor.withOpacity(0.75),
                               ),

@@ -1,6 +1,6 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:skedul/shared/theme/text.dart';
+import 'package:skedul/shared/theme/theme.dart';
 
 class DottedCard extends StatelessWidget {
   const DottedCard({super.key, required this.icon, required this.text});
@@ -29,7 +29,7 @@ class DottedCard extends StatelessWidget {
             Expanded(
               child: Text(
                 text,
-                style: kTextMedium18.copyWith(color: Colors.grey),
+                style: AppTheme.kTextMedium18.copyWith(color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
             ),

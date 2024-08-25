@@ -1,6 +1,6 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:skedul/shared/theme/colors.dart';
+import 'package:skedul/shared/theme/theme.dart';
 
 class DottedCardLoading extends StatelessWidget {
   const DottedCardLoading({super.key});
@@ -20,7 +20,7 @@ class DottedCardLoading extends StatelessWidget {
             child: SizedBox(
               height: 50,
               width: 50,
-              child: CircularProgressIndicator(color: kColorPrimary),
+              child: CircularProgressIndicator(color: AppTheme.kColorPrimary),
             ),
           ),
         ),

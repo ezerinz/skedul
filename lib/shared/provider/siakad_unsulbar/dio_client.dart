@@ -1,6 +1,9 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'dio_client.g.dart';
 
 class DioClient {
   final Dio _dio;
@@ -116,4 +119,9 @@ class DioClient {
       rethrow;
     }
   }
+}
+
+@riverpod
+DioClient dioClient(DioClientRef ref) {
+  return DioClient(Dio());
 }

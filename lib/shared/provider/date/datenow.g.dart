@@ -6,7 +6,7 @@ part of 'datenow.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$todayDateHash() => r'4866b209ef345ece8a63a913eeb558d6d3a06a96';
+String _$todayDateHash() => r'a8e47f1d8640e7b1ebcc986b41bbec753e82ee69';
 
 /// See also [todayDate].
 @ProviderFor(todayDate)

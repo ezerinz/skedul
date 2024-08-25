@@ -6,7 +6,7 @@ part of 'jadwal_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$jadwalHash() => r'fda48d5c0dd4c8b27d3aa7351b8135f163fd29f6';
+String _$jadwalHash() => r'3df3d8ddd419e9f37deab3399190010d0d5cf08d';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -34,7 +34,7 @@ class _SystemHash {
 const jadwalProvider = JadwalFamily();
 
 /// See also [jadwal].
-class JadwalFamily extends Family<AsyncValue<List<MataKuliahData>>> {
+class JadwalFamily extends Family<AsyncValue<List<Makul>>> {
   /// See also [jadwal].
   const JadwalFamily();
 
@@ -72,7 +72,7 @@ class JadwalFamily extends Family<AsyncValue<List<MataKuliahData>>> {
 }
 
 /// See also [jadwal].
-class JadwalProvider extends AutoDisposeStreamProvider<List<MataKuliahData>> {
+class JadwalProvider extends AutoDisposeStreamProvider<List<Makul>> {
   /// See also [jadwal].
   JadwalProvider(
     int day,
@@ -106,7 +106,7 @@ class JadwalProvider extends AutoDisposeStreamProvider<List<MataKuliahData>> {
 
   @override
   Override overrideWith(
-    Stream<List<MataKuliahData>> Function(JadwalRef provider) create,
+    Stream<List<Makul>> Function(JadwalRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -123,7 +123,7 @@ class JadwalProvider extends AutoDisposeStreamProvider<List<MataKuliahData>> {
   }
 
   @override
-  AutoDisposeStreamProviderElement<List<MataKuliahData>> createElement() {
+  AutoDisposeStreamProviderElement<List<Makul>> createElement() {
     return _JadwalProviderElement(this);
   }
 
@@ -141,14 +141,13 @@ class JadwalProvider extends AutoDisposeStreamProvider<List<MataKuliahData>> {
   }
 }
 
-mixin JadwalRef on AutoDisposeStreamProviderRef<List<MataKuliahData>> {
+mixin JadwalRef on AutoDisposeStreamProviderRef<List<Makul>> {
   /// The parameter `day` of this provider.
   int get day;
 }
 
 class _JadwalProviderElement
-    extends AutoDisposeStreamProviderElement<List<MataKuliahData>>
-    with JadwalRef {
+    extends AutoDisposeStreamProviderElement<List<Makul>> with JadwalRef {
   _JadwalProviderElement(super.provider);
 
   @override

@@ -4,5 +4,5 @@ part 'datenow.g.dart';
 
 @riverpod
 DateTime todayDate(TodayDateRef ref) {
-  return DateTime.now();
+  return DateTime.now().toLocal();
 }

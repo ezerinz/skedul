@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:skedul/features/tugas/domain/tugas_model.dart';
-import 'package:skedul/features/tugas/presentation/provider/daftar_makul_provider.dart';
-import 'package:skedul/shared/provider/drift/database.dart';
-import 'package:skedul/shared/theme/text.dart';
+import 'package:skedul/shared/theme/theme.dart';
 
 class DetailTugasBottomSheet extends ConsumerWidget {
   const DetailTugasBottomSheet({super.key, required this.tugas});
@@ -13,19 +12,6 @@ class DetailTugasBottomSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dataMakuls = ref.watch(daftarMakulProvider);
-    List<MataKuliahData> makuls = dataMakuls.when(
-      data: (d) => d,
-      error: (_, __) => [],
-      loading: () => [],
-    );
-    var makul = "";
-    for (MataKuliahData data in makuls) {
-      if (data.id == tugas.makul) {
-        makul = data.nama;
-        break;
-      }
-    }
     return Container(
       // height: MediaQuery.of(context).size.height * 0.40,
       width: double.infinity,
@@ -46,7 +32,7 @@ class DetailTugasBottomSheet extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     tugas.judul,
-                    style: kTextSemiBold18,
+                    style: AppTheme.kTextSemiBold18,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -66,15 +52,15 @@ class DetailTugasBottomSheet extends ConsumerWidget {
               height: 2.0,
             ),
             Text(
-              "Matakuliah: $makul",
-              style: kTextMedium16.copyWith(
+              "Matakuliah: ${tugas.makul.nama}",
+              style: AppTheme.kTextMedium16.copyWith(
                 color: Colors.grey,
                 fontSize: 14,
               ),
             ),
             Text(
-              "Deadline: ${tugas.deadline}",
-              style: kTextMedium16.copyWith(
+              "Deadline: ${DateFormat("dd MMMM yyyy, HH:mm", "ID_id").format(tugas.deadline)}",
+              style: AppTheme.kTextMedium16.copyWith(
                 color: Colors.grey,
                 fontSize: 14,
               ),
@@ -84,7 +70,7 @@ class DetailTugasBottomSheet extends ConsumerWidget {
             ),
             Text(
               tugas.deskripsi,
-              style: kTextMedium16.copyWith(fontSize: 12),
+              style: AppTheme.kTextMedium16.copyWith(fontSize: 12),
               textAlign: TextAlign.justify,
             ),
             const SizedBox(

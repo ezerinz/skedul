@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class DialogPage<T> extends Page<T> {
@@ -12,7 +14,7 @@ class DialogPage<T> extends Page<T> {
   const DialogPage({
     required this.builder,
     this.anchorPoint,
-    this.barrierColor = Colors.black38,
+    this.barrierColor = Colors.black54,
     this.barrierDismissible = true,
     this.barrierLabel,
     this.useSafeArea = true,
@@ -27,12 +29,15 @@ class DialogPage<T> extends Page<T> {
   Route<T> createRoute(BuildContext context) => DialogRoute<T>(
         context: context,
         settings: this,
-        builder: (context) => Dialog(
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+        builder: (context) => BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Dialog(
+              insetPadding: const EdgeInsets.all(15.0),
+              child: builder(context),
+            ),
           ),
-          child: builder(context),
         ),
         anchorPoint: anchorPoint,
         barrierColor: barrierColor,

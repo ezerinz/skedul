@@ -1,4 +1,4 @@
-# skedul
+# Skedul
 
 A new Flutter project.
 

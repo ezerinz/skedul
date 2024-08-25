@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skedul/shared/provider/settings/system_theme_provider.dart';
-import 'package:skedul/shared/theme/text.dart';
+import 'package:skedul/shared/provider/settings/settings_provider.dart';
+import 'package:skedul/shared/theme/theme.dart';
 
 class StatisticCard extends ConsumerWidget {
   const StatisticCard({
@@ -21,7 +21,7 @@ class StatisticCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = ref.watch(themeChoosenProvider);
+    final isDark = ref.watch(isDarkModeProvider);
 
     return Container(
       decoration: BoxDecoration(
@@ -34,7 +34,7 @@ class StatisticCard extends ConsumerWidget {
           leading ??
               Text(
                 number,
-                style: kTextSemiBold24.copyWith(
+                style: AppTheme.kTextSemiBold24.copyWith(
                   fontSize: 40,
                   // color: foregroundColor,
                 ),
@@ -45,7 +45,7 @@ class StatisticCard extends ConsumerWidget {
           Expanded(
             child: Text(
               text,
-              style: kTextMedium18,
+              style: AppTheme.kTextMedium18,
               textAlign: TextAlign.center,
             ),
           ),

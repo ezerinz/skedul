@@ -2,14 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skedul/features/jadwal/data/jadwal_repository_provider.dart';
+import 'package:realm/realm.dart';
+import 'package:skedul/features/jadwal/data/jadwal_repository.dart';
 import 'package:skedul/features/siakad_integration/presentation/controller/captcha_provider.dart';
-import 'package:skedul/shared/provider/drift/database.dart';
-import 'package:skedul/shared/provider/settings/system_theme_provider.dart';
+import 'package:skedul/shared/provider/realm/model.dart';
+import 'package:skedul/shared/provider/settings/settings_provider.dart';
 import 'package:skedul/shared/provider/siakad_unsulbar/siakad_model.dart';
-import 'package:skedul/shared/provider/siakad_unsulbar/siakad_services_provider.dart';
-import 'package:skedul/shared/theme/colors.dart';
-import 'package:skedul/shared/theme/text.dart';
+import 'package:skedul/shared/provider/siakad_unsulbar/siakad_services.dart';
+import 'package:skedul/shared/theme/theme.dart';
+import 'package:skedul/shared/utils/utils.dart';
 import 'package:skedul/shared/widgets/rounded_textfield.dart';
 
 class SiakadIntegration extends ConsumerStatefulWidget {
@@ -34,15 +35,13 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
   @override
   Widget build(BuildContext context) {
     final captcha = ref.watch(captchaProvider);
-    final isDark = ref.watch(themeChoosenProvider);
+    final isDark = ref.watch(isDarkModeProvider);
 
     return Scaffold(
       appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        title: const Text("Integrasi Siakad"),
-        titleTextStyle: kTextSemiBold18.copyWith(
-            color: isDark ? kColorDarkForeground : Colors.black,
+        title: const Text("Integrasi SIAKAD"),
+        titleTextStyle: AppTheme.kTextSemiBold18.copyWith(
+            color: isDark ? AppTheme.kColorDarkForeground : Colors.black,
             fontFamily: "KumbhSans"),
       ),
       body: SafeArea(
@@ -55,7 +54,7 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                       children: [
                         const Text(
                           "Integrasi Sukses",
-                          style: kTextSemiBold24,
+                          style: AppTheme.kTextSemiBold24,
                         ),
                         const SizedBox(
                           height: 10.0,
@@ -67,8 +66,8 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                               context.pop();
                             },
                             style: ElevatedButton.styleFrom(
-                              surfaceTintColor: kColorPrimary,
-                              foregroundColor: kColorPrimary,
+                              surfaceTintColor: AppTheme.kColorPrimary,
+                              foregroundColor: AppTheme.kColorPrimary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
@@ -89,7 +88,7 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                             integrasiFailed
                                 ? "Integrasi gagal"
                                 : "Login Berhasil",
-                            style: kTextSemiBold24,
+                            style: AppTheme.kTextSemiBold24,
                           ),
                           Text(integrasiFailed
                               ? "Ingin masuk ulang?"
@@ -108,8 +107,8 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                                       });
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      surfaceTintColor: kColorPrimary,
-                                      foregroundColor: kColorPrimary,
+                                      surfaceTintColor: AppTheme.kColorPrimary,
+                                      foregroundColor: AppTheme.kColorPrimary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(10.0),
@@ -123,7 +122,8 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                                   width: 100,
                                   child: Center(
                                     child: CircularProgressIndicator(
-                                      color: kColorPrimary.withOpacity(0.5),
+                                      color: AppTheme.kColorPrimary
+                                          .withOpacity(0.5),
                                     ),
                                   ),
                                 ),
@@ -144,8 +144,8 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                   children: [
                     Text(
                       "Login ke SIAKAD UNSULBAR dan sinkronisasi jadwal kuliahmu",
-                      style:
-                          kTextMedium16.copyWith(fontWeight: FontWeight.w400),
+                      style: AppTheme.kTextMedium16
+                          .copyWith(fontWeight: FontWeight.w400),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(
@@ -196,7 +196,9 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                               height: 58,
                               child: Center(
                                 child: CircularProgressIndicator(
-                                    color: kColorPrimary.withOpacity(0.5)),
+                                  color:
+                                      AppTheme.kColorPrimary.withOpacity(0.5),
+                                ),
                               ),
                             ),
                           ),
@@ -259,16 +261,24 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                                     setState(() {
                                       makulInIntegration = m.nama;
                                     });
-                                    final data = MataKuliahCompanion.insert(
-                                        hari: m.hari,
-                                        nama: m.nama,
-                                        ruangan: m.ruangan,
-                                        kelas: m.kelas,
-                                        sks: m.sks,
-                                        jam: m.jam);
-                                    await repository.insertMakul(data);
+                                    final jamSplit = m.jam.split(":");
+                                    repository.insertMakul(
+                                      Makul(
+                                        ObjectId(),
+                                        m.hari,
+                                        m.nama,
+                                        m.ruangan,
+                                        m.sks,
+                                        m.kelas,
+                                        jam: Waktu(
+                                          int.parse(jamSplit[0]),
+                                          int.parse(jamSplit[1]),
+                                        ),
+                                      ),
+                                    );
                                     await Future.delayed(
-                                        const Duration(seconds: 1));
+                                      const Duration(seconds: 1),
+                                    );
                                   }
 
                                   setState(() {
@@ -295,8 +305,8 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          surfaceTintColor: kColorPrimary,
-                          foregroundColor: kColorPrimary,
+                          surfaceTintColor: AppTheme.kColorPrimary,
+                          foregroundColor: AppTheme.kColorPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
@@ -307,7 +317,9 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                                   height: 20,
                                   width: 20,
                                   child: CircularProgressIndicator(
-                                      color: kColorPrimary.withOpacity(0.5)),
+                                    color:
+                                        AppTheme.kColorPrimary.withOpacity(0.5),
+                                  ),
                                 ),
                               )
                             : const Text("Masuk"),
@@ -316,18 +328,6 @@ class _SiakadIntegrationState extends ConsumerState<SiakadIntegration> {
                   ],
                 ),
               ),
-      ),
-    );
-  }
-
-  SnackBar snackBarCustom(bool isDark, String message) {
-    return SnackBar(
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: isDark ? kColorDark : Colors.white,
-      margin: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
-      content: Text(
-        message,
-        style: TextStyle(color: isDark ? kColorDarkForeground : kColorDark),
       ),
     );
   }

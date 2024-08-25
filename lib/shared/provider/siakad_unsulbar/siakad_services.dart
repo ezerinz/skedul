@@ -1,8 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:skedul/shared/provider/siakad_unsulbar/dio_client.dart';
 import 'package:skedul/shared/provider/siakad_unsulbar/functions.dart';
 import 'package:skedul/shared/provider/siakad_unsulbar/siakad_model.dart';
 import 'package:html/parser.dart' as html_parser;
+
+part 'siakad_services.g.dart';
 
 class SiakadServices {
   final DioClient dio;
@@ -87,4 +90,10 @@ class SiakadServices {
       rethrow;
     }
   }
+}
+
+@riverpod
+SiakadServices siakadServices(SiakadServicesRef ref) {
+  final dio = ref.watch(dioClientProvider);
+  return SiakadServices(dio);
 }

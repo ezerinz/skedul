@@ -2,7 +2,7 @@ name: skedul
 description: A new Flutter project.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 2.0.0+1
 
 environment:
   sdk: ^3.5.0
@@ -12,37 +12,44 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  intl: ^0.18.1
+  intl: ^0.19.0
   table_calendar: ^3.0.9
   dotted_border: ^2.1.0
-  scrollable_positioned_list: ^0.3.8
   flutter_riverpod: ^2.4.8
   riverpod_annotation: ^2.3.2
-  go_router: ^12.1.1
+  go_router: ^14.2.6
   shared_preferences: ^2.2.2
   dropdown_button2: ^2.3.9
   day_night_time_picker: ^1.3.0+1
-  drift: ^2.13.2
-  sqlite3_flutter_libs: ^0.5.0
-  path_provider: ^2.0.0
+  path_provider: ^2.1.4
   path: ^1.8.3
-  drift_db_viewer: ^2.0.0
   dio: ^5.4.0
   html: ^0.15.4
   dio_cookie_manager: ^3.1.1
   cookie_jar: ^4.0.8
   flutter_slidable: ^3.1.1
+  flutter_slidable_panel: ^1.1.4
+  realm: ^3.4.1
+  file_picker: ^8.1.2
+  permission_handler: ^11.3.1
+  device_info_plus: ^10.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
   riverpod_generator: ^2.3.8
   build_runner: ^2.4.6
-  custom_lint: ^0.5.7
+  custom_lint: ^0.6.5
   riverpod_lint: ^2.3.7
-  drift_dev: ^2.13.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "skedul_icon"
+  image_path: "assets/AppIcon.png"
+  adaptive_icon_background: "assets/AppIconBackground.png"
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true

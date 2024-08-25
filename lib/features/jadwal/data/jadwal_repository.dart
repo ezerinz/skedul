@@ -1,42 +1,100 @@
-import 'package:drift/drift.dart';
-import 'package:skedul/shared/provider/drift/database.dart';
+import 'package:realm/realm.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:skedul/shared/provider/realm/model.dart';
+import 'package:skedul/shared/provider/realm/realm.dart';
+import 'package:skedul/shared/provider/settings/user_data.dart';
+
+part 'jadwal_repository.g.dart';
 
 class JadwalRepository {
-  final AppDatabase database;
+  final Realm realm;
+  final ObjectId semesterId;
 
-  JadwalRepository(this.database);
+  JadwalRepository(this.realm, this.semesterId);
 
-  Future<int> insertMakul(MataKuliahCompanion makul) {
-    return database.into(database.mataKuliah).insert(makul);
+  void insertMakul(Makul newMakul) {
+    final semester = realm.find<Semester>(semesterId);
+    if (semester != null) {
+      realm.write(() {
+        semester.makul.add(newMakul);
+      });
+    }
   }
 
-  Stream<List<MataKuliahData>> watchMakuls() {
-    return (database.select(database.mataKuliah)
-          ..orderBy(
-            [
-              (t) => OrderingTerm(expression: t.hari),
-              (t) => OrderingTerm(expression: t.jam),
-            ],
-          ))
-        .watch();
+  void updateMakul(Makul newMakul) {
+    final semester = realm.find<Semester>(semesterId);
+
+    if (semester != null) {
+      Makul makul = semester.makul.firstWhere((t) => t.id == newMakul.id);
+
+      realm.write(() {
+        makul.nama = newMakul.nama;
+        makul.hari = newMakul.hari;
+        makul.jam = newMakul.jam;
+        makul.sks = newMakul.sks;
+        makul.kelas = newMakul.kelas;
+        makul.ruangan = newMakul.ruangan;
+      });
+    }
   }
 
-  Stream<List<MataKuliahData>> watchMakulsById(int day) {
-    return (database.select(database.mataKuliah)
-          ..where((tbl) => tbl.hari.equals(day))
-          ..orderBy([(t) => OrderingTerm(expression: t.jam)]))
-        .watch();
+  void deleteMakul(ObjectId makulId) {
+    final semester = realm.find<Semester>(semesterId);
+
+    if (semester != null) {
+      realm.write(() {
+        semester.makul.removeWhere((t) => t.id == makulId);
+      });
+    }
   }
 
-  Future<int> updateMakul(int id, MataKuliahCompanion makul) {
-    return (database.update(database.mataKuliah)
-          ..where((tbl) => tbl.id.equals(id)))
-        .write(makul);
+  Stream<List<Makul>> streamMakul() async* {
+    final semester = realm.find<Semester>(semesterId);
+    if (semester != null) {
+      // ignore: unused_local_variable
+      await for (var c in semester.makul.changes) {
+        final data = List<Makul>.from(semester.makul);
+        data.sort(
+          (a, b) =>
+              DateTime(2024, 1, a.hari, a.jam!.hour, a.jam!.minute).compareTo(
+            DateTime(2024, 1, b.hari, b.jam!.hour, b.jam!.minute),
+          ),
+        );
+
+        yield data;
+      }
+    } else {
+      yield [];
+    }
   }
 
-  Future deleteMakul(int id) {
-    return (database.delete(database.mataKuliah)
-          ..where((tbl) => tbl.id.equals(id)))
-        .go();
+  Stream<List<Makul>> streamMakulByDay(int day) async* {
+    final semester = realm.find<Semester>(semesterId);
+    if (semester != null) {
+      // ignore: unused_local_variable
+      await for (var c in semester.makul.changes) {
+        final data = List<Makul>.from(semester.makul)
+            .where((t) => t.hari == day)
+            .toList();
+        data.sort(
+          (a, b) =>
+              DateTime(2024, 1, a.hari, a.jam!.hour, a.jam!.minute).compareTo(
+            DateTime(2024, 1, b.hari, b.jam!.hour, b.jam!.minute),
+          ),
+        );
+
+        yield data;
+      }
+    } else {
+      yield [];
+    }
   }
+}
+
+@riverpod
+JadwalRepository jadwalRepository(JadwalRepositoryRef ref) {
+  final realm = ref.watch(realmProvider);
+  final semesterId = ref.watch(currentSemesterProvider);
+
+  return JadwalRepository(realm, semesterId);
 }

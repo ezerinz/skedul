@@ -1,64 +1,91 @@
+import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:skedul/features/home/presentation/controllers/calendar_provider.dart';
-import 'package:skedul/features/tugas/presentation/provider/tugas_all_provider.dart';
+import 'package:skedul/features/home/presentation/controller/calendar_page.dart';
+import 'package:skedul/features/home/presentation/controller/calendar_provider.dart';
+import 'package:skedul/features/tugas/domain/tugas_model.dart';
 import 'package:skedul/shared/provider/date/datenow.dart';
-import 'package:skedul/shared/theme/colors.dart';
-import 'package:skedul/shared/theme/text.dart';
+import 'package:skedul/shared/theme/theme.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class Event {
-  final String title;
-
-  const Event(this.title);
-
-  @override
-  String toString() => title;
-}
-
 class CalendarContainer extends ConsumerWidget {
-  const CalendarContainer({super.key, required this.rowHeight});
+  const CalendarContainer(this.events, {super.key, required this.rowHeight});
   final double rowHeight;
+  final LinkedHashMap<DateTime, List<TugasModel>> events;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedDate = ref.watch(calendarProvider);
-    final todayDate = ref.watch(todayDateProvider);
+    final todayDate = ref.watch(todayDateProvider).toLocal();
     return TableCalendar(
-      onDaySelected: (selectedDay, focusedDay) {
-        ref.watch(calendarProvider.notifier).updateSelected(selectedDay);
+      onPageChanged: (date) {
+        ref.read(calendarProvider.notifier).updateSelected(
+              selectedDate.copyWith(month: date.month),
+            );
+        ref.read(calendarPageProvider.notifier).update(date);
       },
-      currentDay: selectedDate,
-      eventLoader: (day) {
-        final date = ref.watch(tugasAllProvider);
-        String currentDay = day.toString();
-        currentDay = currentDay.substring(0, currentDay.length - 1);
-
-        return switch (date) {
-          AsyncData(:final value) => value[currentDay] ?? [],
-          AsyncError() => [],
-          _ => [],
-        };
+      selectedDayPredicate: (day) {
+        return isSameDay(selectedDate, day);
+      },
+      onDaySelected: (selectedDay, focusedDay) {
+        if (!isSameDay(selectedDate, selectedDay)) {
+          ref.watch(calendarProvider.notifier).updateSelected(selectedDay);
+        }
+      },
+      currentDay: ref.watch(todayDateProvider).toLocal(),
+      eventLoader: (dates) {
+        return events[dates] ?? [];
       },
       calendarBuilders: CalendarBuilders(
+        todayBuilder: (context, day, focusedDay) {
+          return Center(
+            child: Text(
+              "${day.day}",
+              style: const TextStyle(
+                color: AppTheme.kColorSecondary,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          );
+        },
+        selectedBuilder: (context, day, focusedDay) {
+          return Center(
+            child: Container(
+              margin: const EdgeInsets.all(5.0),
+              decoration: const BoxDecoration(
+                color: AppTheme.kColorSecondary,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  "${focusedDay.day}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
         dowBuilder: (context, day) {
           return Center(
             child: Text(
               DateFormat("EEE", "id_ID").format(day).toUpperCase(),
-              style: kTextSemiBold24.copyWith(fontSize: 14),
+              style: AppTheme.kTextSemiBold24.copyWith(fontSize: 14),
             ),
           );
         },
         singleMarkerBuilder: (context, day, event) {
-          if (day == selectedDate) {
-            return Container();
-          }
           return Container(
-            height: 6.0,
-            width: 6.0,
+            height: 4.0,
+            width: 4.0,
+            margin: EdgeInsets.only(
+                top: selectedDate == day ? 8.0 : 0, left: 0.5, right: 0.5),
             decoration: const BoxDecoration(
-              color: kColorSecondary,
+              color: AppTheme.kColorSecondary,
               shape: BoxShape.circle,
             ),
           );
@@ -74,7 +101,7 @@ class CalendarContainer extends ConsumerWidget {
       ),
       calendarStyle: const CalendarStyle(
         todayDecoration: BoxDecoration(
-          color: kColorSecondary,
+          color: AppTheme.kColorSecondary,
           shape: BoxShape.circle,
         ),
         defaultTextStyle: TextStyle(fontWeight: FontWeight.w600),

@@ -1,11 +1,17 @@
+import 'package:skedul/shared/provider/realm/model.dart';
+
 class TugasModel {
-  int id;
-  int makul;
+  String id;
+  Makul makul;
   String judul;
   String deskripsi;
-  String deadline;
-  int difference;
+  DateTime deadline;
 
-  TugasModel(this.id, this.makul, this.judul, this.deskripsi, this.deadline,
-      this.difference);
+  TugasModel(
+    this.id,
+    this.makul,
+    this.judul,
+    this.deskripsi,
+    this.deadline,
+  );
 }

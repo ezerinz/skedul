@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skedul/shared/provider/shared_pref/shared_pref_helper_provider.dart';
-import 'package:skedul/shared/theme/colors.dart';
-import 'package:skedul/shared/theme/text.dart';
+import 'package:realm/realm.dart';
+import 'package:skedul/features/auth/data/semester_repository.dart';
+import 'package:skedul/shared/provider/realm/model.dart';
+import 'package:skedul/shared/provider/settings/user_data.dart';
+import 'package:skedul/shared/theme/theme.dart';
 
 class InitialScreen extends ConsumerStatefulWidget {
   const InitialScreen({super.key});
@@ -14,6 +16,8 @@ class InitialScreen extends ConsumerStatefulWidget {
 
 class _InitialScreenState extends ConsumerState<InitialScreen> {
   String name = "";
+  String jurusan = "";
+  String semester = "";
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +36,7 @@ class _InitialScreenState extends ConsumerState<InitialScreen> {
                       width: MediaQuery.of(context).size.width * 0.30,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
-                        color: kColorSecondary.withOpacity(0.5),
+                        color: AppTheme.kColorSecondary.withOpacity(0.5),
                       ),
                     ),
                     const SizedBox(
@@ -43,7 +47,7 @@ class _InitialScreenState extends ConsumerState<InitialScreen> {
                         height: 20,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10.0),
-                            color: kColorPrimary.withOpacity(0.5)),
+                            color: AppTheme.kColorPrimary.withOpacity(0.5)),
                       ),
                     ),
                   ],
@@ -52,31 +56,81 @@ class _InitialScreenState extends ConsumerState<InitialScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: Text(
-                    'Halo, ${name.split(' ')[0]}${name.isNotEmpty ? "!" : ""}',
-                    style: kTextSemiBold24.copyWith(fontSize: 30),
+                    'Halo, ${name.split(' ')[0]}',
+                    style: AppTheme.kTextSemiBold24.copyWith(fontSize: 30),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                 ),
                 Text(
                   'Selamat Datang. ${name.isNotEmpty ? "" : "Nama kamu siapa?"}',
-                  style: kTextMedium18,
+                  style: AppTheme.kTextMedium18,
                 ),
                 const SizedBox(
                   height: 10.0,
                 ),
                 TextField(
                   textAlign: TextAlign.center,
-                  cursorColor: kColorPrimary,
+                  cursorColor: AppTheme.kColorPrimary,
                   onChanged: (value) {
                     setState(() {
                       name = value.trim();
                     });
                   },
-                  style: kTextMedium18,
-                  decoration: const InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: kColorPrimary),
+                  style: AppTheme.kTextMedium18,
+                  decoration: InputDecoration(
+                    hintText: "Nama",
+                    hintStyle: AppTheme.kTextMedium18.copyWith(
+                      color: Colors.grey,
+                    ),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: AppTheme.kColorPrimary),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10.0,
+                ),
+                TextField(
+                  textAlign: TextAlign.center,
+                  readOnly: name.isEmpty,
+                  cursorColor: AppTheme.kColorPrimary,
+                  onChanged: (value) {
+                    setState(() {
+                      jurusan = value.trim();
+                    });
+                  },
+                  style: AppTheme.kTextMedium18,
+                  decoration: InputDecoration(
+                    hintText: "Jurusan",
+                    hintStyle: AppTheme.kTextMedium18.copyWith(
+                      color: Colors.grey,
+                    ),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: AppTheme.kColorPrimary),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10.0,
+                ),
+                TextField(
+                  textAlign: TextAlign.center,
+                  readOnly: name.isEmpty || jurusan.isEmpty,
+                  cursorColor: AppTheme.kColorPrimary,
+                  onChanged: (value) {
+                    setState(() {
+                      semester = value.trim();
+                    });
+                  },
+                  style: AppTheme.kTextMedium18,
+                  decoration: InputDecoration(
+                    hintText: "Semester",
+                    hintStyle: AppTheme.kTextMedium18.copyWith(
+                      color: Colors.grey,
+                    ),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: AppTheme.kColorPrimary),
                     ),
                   ),
                 ),
@@ -86,17 +140,32 @@ class _InitialScreenState extends ConsumerState<InitialScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
-                    onPressed: name.isEmpty
+                    onPressed: name.isEmpty ||
+                            jurusan.isEmpty ||
+                            semester.isEmpty
                         ? null
                         : () async {
+                            await ref.read(nameProvider.notifier).update(name);
                             await ref
-                                .watch(sharedPrefsHelperProvider)
-                                .saveName(name);
-                            if (context.mounted) context.go('/home');
+                                .read(jurusanProvider.notifier)
+                                .update(jurusan);
+
+                            final id = ObjectId();
+                            final newSemester = Semester(id, semester);
+                            ref
+                                .read(semesterRepositoryProvider)
+                                .insert(newSemester);
+                            ref
+                                .read(currentSemesterProvider.notifier)
+                                .update(id);
+
+                            if (context.mounted) {
+                              context.go('/home');
+                            }
                           },
                     style: ElevatedButton.styleFrom(
-                      surfaceTintColor: kColorSecondary,
-                      foregroundColor: kColorSecondary,
+                      surfaceTintColor: AppTheme.kColorSecondary,
+                      foregroundColor: AppTheme.kColorSecondary,
                       elevation: 4.0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -113,7 +182,7 @@ class _InitialScreenState extends ConsumerState<InitialScreen> {
                         height: 20,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10.0),
-                          color: kColorPrimary.withOpacity(0.5),
+                          color: AppTheme.kColorPrimary.withOpacity(0.5),
                         ),
                       ),
                     ),
@@ -125,7 +194,7 @@ class _InitialScreenState extends ConsumerState<InitialScreen> {
                       width: MediaQuery.of(context).size.width * 0.30,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
-                        color: kColorSecondary.withOpacity(0.5),
+                        color: AppTheme.kColorSecondary.withOpacity(0.5),
                       ),
                     ),
                   ],
