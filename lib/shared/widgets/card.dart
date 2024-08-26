@@ -29,9 +29,6 @@ class CustomCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const double fillPercent = 2.5;
-    const double fillStop = fillPercent / 100;
-    final List<double> stops = [0.0, fillStop, fillStop, 1.0];
     final isDark = ref.watch(isDarkModeProvider);
 
     return ClipRRect(

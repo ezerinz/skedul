@@ -83,6 +83,7 @@ class TugasRepository {
     final semester = realm.find<Semester>(semesterId);
 
     if (semester != null) {
+      // ignore: unused_local_variable
       await for (var c in semester.makul.changes) {
         final List<TugasModel> tugasList = [];
         for (Makul makul in semester.makul) {

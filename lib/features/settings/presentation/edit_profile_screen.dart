@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:realm/realm.dart';
 import 'package:skedul/features/auth/data/semester_repository.dart';
-import 'package:skedul/features/settings/presentation/controller/daftar_semester.dart';
+import 'package:skedul/features/settings/presentation/controller/daftar_semester_provider.dart';
 import 'package:skedul/shared/provider/settings/settings_provider.dart';
 import 'package:skedul/shared/provider/settings/user_data.dart';
 import 'package:skedul/shared/theme/theme.dart';

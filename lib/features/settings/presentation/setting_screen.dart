@@ -159,7 +159,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                         controller: batasTugasCtrl,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 6.0,
                     ),
                     ClipRRect(

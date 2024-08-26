@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'calendar_page.g.dart';
+part 'calendar_page_provider.g.dart';
 
 @riverpod
 class CalendarPage extends _$CalendarPage {

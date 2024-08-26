@@ -2,7 +2,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:skedul/features/home/presentation/controller/calendar_page.dart';
+import 'package:skedul/features/home/presentation/controller/calendar_page_provider.dart';
 import 'package:skedul/features/home/presentation/controller/calendar_provider.dart';
 import 'package:skedul/features/tugas/domain/tugas_model.dart';
 import 'package:skedul/shared/provider/date/datenow.dart';

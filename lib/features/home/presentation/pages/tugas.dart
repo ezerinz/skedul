@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:skedul/features/home/presentation/controller/calendar_page.dart';
+import 'package:skedul/features/home/presentation/controller/calendar_page_provider.dart';
 import 'package:skedul/features/home/presentation/controller/calendar_provider.dart';
 import 'package:skedul/features/home/presentation/widgets/calendar.dart';
 import 'package:skedul/features/tugas/presentation/controller/tugas_by_date_provider.dart';
@@ -46,8 +46,8 @@ class TugasPage extends ConsumerWidget {
             ),
             switch (dataTugas) {
               AsyncData(:final value) => Padding(
-                  padding:
-                      EdgeInsets.only(left: 15.0, right: 15.0, bottom: 92.0),
+                  padding: const EdgeInsets.only(
+                      left: 15.0, right: 15.0, bottom: 92.0),
                   child: Column(
                     children: [
                       ListTugas(
