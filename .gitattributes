@@ -1,1 +1,2 @@
 *.g.dart binary
+*.g.dart linguist-generated=true

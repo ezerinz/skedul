@@ -102,7 +102,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                   ),
                                 ),
                                 hint: const Text("Semester"),
-                                value: blocked ? null : selectedSemester,
+                                value: blocked
+                                    ? null
+                                    : selectedSemester.toString(),
                                 items: blocked
                                     ? []
                                     : switch (daftarSemester) {
