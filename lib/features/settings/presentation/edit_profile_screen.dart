@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:realm/realm.dart';
 import 'package:skedul/features/auth/data/semester_repository.dart';
 import 'package:skedul/features/settings/presentation/controller/daftar_semester.dart';
-import 'package:skedul/shared/provider/realm/model.dart';
 import 'package:skedul/shared/provider/settings/settings_provider.dart';
 import 'package:skedul/shared/provider/settings/user_data.dart';
 import 'package:skedul/shared/theme/theme.dart';
@@ -21,7 +20,7 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
-  late String selectedSemester;
+  late ObjectId selectedSemester;
   bool editingSemester = false;
   TextEditingController namaCtrl = TextEditingController();
   TextEditingController jurusanCtrl = TextEditingController();
@@ -32,7 +31,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    selectedSemester = ref.read(currentSemesterProvider).toString();
+    selectedSemester = ref.read(currentSemesterProvider);
     namaCtrl.text = ref.read(nameProvider);
     jurusanCtrl.text = ref.read(jurusanProvider);
   }
@@ -41,6 +40,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget build(BuildContext context) {
     final daftarSemester = ref.watch(daftarSemesterProvider);
     final isDark = ref.watch(isDarkModeProvider);
+    final currentSemester = ref.watch(currentSemesterProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -120,7 +120,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 onChanged: (value) {
                                   setState(
                                     () {
-                                      selectedSemester = value as String;
+                                      selectedSemester = ObjectId.fromHexString(
+                                          value as String);
                                     },
                                   );
                                 },
@@ -140,14 +141,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                   );
                                 } else {
                                   ref.read(semesterRepositoryProvider).update(
-                                        Semester(
-                                            ObjectId.fromHexString(
-                                                selectedSemester),
-                                            semesterCtrl.text),
+                                        selectedSemester,
+                                        semesterCtrl.text,
                                       );
-                                  if (ObjectId.fromHexString(
-                                          selectedSemester) ==
-                                      ref.watch(currentSemesterProvider)) {
+
+                                  if (selectedSemester == currentSemester) {
                                     ref.invalidate(currentSemesterProvider);
                                   }
                                   setState(() {
@@ -159,10 +157,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                   editingSemester = true;
                                 });
                                 semesterCtrl.text = ref
-                                    .watch(semesterRepositoryProvider)
-                                    .getSemesterById(
-                                      ObjectId.fromHexString(selectedSemester),
-                                    )!
+                                    .read(semesterRepositoryProvider)
+                                    .getSemesterById(selectedSemester)!
                                     .name;
                                 semesterFocusNode.requestFocus();
                               }
@@ -234,21 +230,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                                     setState(() {
                                                       blocked = true;
                                                     });
-                                                    final repository = ref.watch(
+                                                    final repository = ref.read(
                                                         semesterRepositoryProvider);
 
                                                     repository.delete(
                                                       repository
                                                           .getSemesterById(
-                                                        ObjectId.fromHexString(
-                                                            selectedSemester),
+                                                        selectedSemester,
                                                       )!,
                                                     );
 
-                                                    if (ref.watch(
-                                                            currentSemesterProvider) ==
-                                                        ObjectId.fromHexString(
-                                                            selectedSemester)) {
+                                                    if (currentSemester ==
+                                                        selectedSemester) {
                                                       ref
                                                           .read(
                                                               currentSemesterProvider
@@ -261,8 +254,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                                       selectedSemester =
                                                           repository
                                                               .getFirst()
-                                                              .id
-                                                              .toString();
+                                                              .id;
                                                     });
                                                     setState(() {
                                                       blocked = false;
@@ -316,7 +308,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               ),
                             ),
                           ),
-                        AsyncError(:final error) => Container(),
+                        AsyncError() => Container(),
                         _ => Container(
                             height: 50,
                             width: 50,
@@ -374,7 +366,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               );
                           await ref
                               .read(currentSemesterProvider.notifier)
-                              .update(ObjectId.fromHexString(selectedSemester));
+                              .update(selectedSemester);
 
                           if (context.mounted) {
                             context.pop();

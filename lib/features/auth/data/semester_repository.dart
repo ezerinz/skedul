@@ -16,9 +16,10 @@ class SemesterRepository {
     });
   }
 
-  void update(Semester updatedSemester) {
+  void update(ObjectId id, String name) {
+    final semester = getSemesterById(id);
     realm.write(() {
-      realm.add(updatedSemester, update: true);
+      semester!.name = name;
     });
   }
 
